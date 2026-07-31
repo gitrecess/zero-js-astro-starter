@@ -33,8 +33,27 @@ nothing in the `<script>` budget at all, because the constraints are the point:
   search engines — see [Going live](#going-live), which explains the part most
   people get wrong.
 
-<!-- TODO: Add Lighthouse scores here once the demo is deployed — run against the
-     live demo rather than localhost, and screenshot or link the report. -->
+### Lighthouse
+
+Run against the [live demo](https://template.iamlukia.com) on 2026-07-31,
+mobile, Lighthouse 12.8.2:
+
+| Performance | Accessibility | Best Practices | SEO |
+| :---------: | :-----------: | :------------: | :-: |
+|   **100**   |    **100**    |    **100**     | **100** |
+
+The whole page is **3 requests and 7.2 KB** — the document, one stylesheet and
+the favicon. Total Blocking Time is 0 ms and Cumulative Layout Shift is 0,
+which is what you would expect from a page with no script to block on and no
+webfont to swap in.
+
+Reproduce it yourself:
+
+```bash
+npx lighthouse https://template.iamlukia.com \
+  --only-categories=performance,accessibility,best-practices,seo \
+  --chrome-flags="--headless"
+```
 
 ## Quick start
 
