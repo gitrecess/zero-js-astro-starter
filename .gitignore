@@ -23,3 +23,9 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# AI coding-tool config — kept local, deliberately never tracked. These hold
+# working notes and machine-specific paths, so they are not part of what this
+# template ships.
+CLAUDE.md
+.claude/

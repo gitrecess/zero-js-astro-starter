@@ -170,10 +170,6 @@ Things that look like omissions but are choices:
 - **Body copy capped at 66 characters.** Line length is the highest-leverage
   readability control on a text-heavy page.
 
-There is also a `CLAUDE.md` describing the architecture and its constraints, which
-is useful if you work with AI coding tools — and a reasonable overview of the
-codebase if you don't.
-
 ## The `demo` branch
 
 `main` is the template: placeholder copy, `example.com` as the origin, and
