@@ -1,0 +1,124 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/Section.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { CONTACT_EMAIL } from '../consts';
+
+// TODO: Replace these three with your own. Capability areas work better than
+// named projects here — nothing on the page then depends on client work that
+// may be under NDA, and the copy stays true as your portfolio changes.
+const services: { title: string; body: string }[] = [
+  {
+    title: 'The work you want more of',
+    body: 'Describe the engagement you would take again tomorrow. Say what the client arrives with, what you do about it, and what they are left holding at the end. Concrete beats comprehensive.',
+  },
+  {
+    title: 'The work you are good at',
+    body: 'Name the problem you solve faster than most people. Two or three sentences is plenty — this card is a door, not the room. Avoid a list of technologies; a prospective client is buying an outcome.',
+  },
+  {
+    title: 'The work others skip',
+    body: 'Whatever you handle that competitors quietly leave out is your strongest card. Deployment, monitoring, handover, documentation, the unglamorous half that decides whether a project survives.',
+  },
+];
+---
+
+<BaseLayout>
+  {/* --- Hero ------------------------------------------------------------ */}
+  <Section>
+    <div class="hero stack-m">
+      {/* TODO: What you do, in one sentence. Keep it under about 12 words —
+          the heading is capped at 22ch so it stacks into strong lines. */}
+      <h1>I build things for the web, end to end</h1>
+      <p class="lead">
+        {/* TODO: Two or three sentences expanding the headline. Who you help,
+            what you take on, and where a project ends up. */}
+        Replace this with your own introduction. Say who you work with, what you
+        take responsibility for, and what someone gets by hiring you rather than
+        the next person on the list.
+      </p>
+      <div class="hero__actions">
+        <a class="button" href="#contact">Start a conversation</a>
+        <a class="button button--ghost" href="#services">What I do</a>
+      </div>
+    </div>
+  </Section>
+
+  {/* --- Services -------------------------------------------------------- */}
+  <Section
+    id="services"
+    title="What I do"
+    intro="TODO: One line framing the three cards below — how you are usually brought in, and that most projects mix them."
+  >
+    <ul class="grid-auto cards">
+      {
+        services.map((service) => (
+          <li class="card">
+            <h3>{service.title}</h3>
+            <p>{service.body}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  {/* --- About ----------------------------------------------------------- */}
+  <Section id="about" title="About">
+    <div class="stack">
+      <p>
+        {/* TODO: Where you came from and what you own now. One paragraph. */}
+        Replace this paragraph with your background — where your depth is, and
+        how far across the stack you work now. Being specific about the shape of
+        your experience is more persuasive than claiming to do everything.
+      </p>
+      <p>
+        {/* TODO: How you work, and who you are a good fit for. One paragraph.
+            Saying who you are *not* right for builds more trust than a list of
+            strengths, and it filters your enquiries for you. */}
+        Then write about how you actually work. What you enjoy, what you would
+        push back on, and the kind of client you do your best work for. Honest
+        beats impressive here — this paragraph decides whether the enquiry you
+        get is one you want.
+      </p>
+    </div>
+  </Section>
+
+  {/* --- Contact --------------------------------------------------------- */}
+  <Section
+    id="contact"
+    title="Get in touch"
+    intro="TODO: Tell people what to include in their message, and what happens next. Setting expectations reduces the back-and-forth."
+  >
+    <ContactForm />
+    <p class="text-small text-muted contact__alt">
+      Prefer email? <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+    </p>
+  </Section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-block: var(--space-l);
+  }
+
+  /* The hero headline gets a tighter measure than body copy so it stacks into
+     two or three strong lines instead of one long ribbon. */
+  .hero h1 {
+    max-width: 22ch;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+  }
+
+  .cards {
+    list-style: none;
+    padding: 0;
+  }
+
+  .contact__alt {
+    margin-block-start: var(--space-m);
+  }
+</style>

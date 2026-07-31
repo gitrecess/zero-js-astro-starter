@@ -1,0 +1,155 @@
+---
+import { SITE_TITLE, SITE_URL, CONTACT_SUBJECT } from '../consts';
+
+/*
+ * A plain HTML form POSTing straight to Web3Forms. No JavaScript at all:
+ * validation is the browser's native `required` handling, and success is a
+ * server-side redirect to /thanks rather than a client-side fetch.
+ *
+ * The access key is PUBLIC by design — it sits in the page source of every
+ * Web3Forms site. The env var exists so there is one place to set it, not to
+ * keep it secret.
+ */
+const accessKey = import.meta.env.PUBLIC_WEB3FORMS_KEY;
+const redirectUrl = new URL('/thanks', SITE_URL).href;
+---
+
+{
+  !accessKey && (
+    <p class="notice">
+      <strong>Form not wired up yet.</strong> Set <code>PUBLIC_WEB3FORMS_KEY</code>{' '}
+      in <code>.env</code> for local use and in your host's environment
+      variables for production, then rebuild. See the README for the walkthrough.
+      This notice disappears once the key is present.
+    </p>
+  )
+}
+
+<form class="form" action="https://api.web3forms.com/submit" method="POST">
+  <input type="hidden" name="access_key" value={accessKey} />
+  <input type="hidden" name="subject" value={CONTACT_SUBJECT} />
+  <input type="hidden" name="from_name" value={SITE_TITLE} />
+  <input type="hidden" name="redirect" value={redirectUrl} />
+
+  <!--
+    Honeypot. Web3Forms silently discards any submission where this is ticked.
+    The name must be exactly "botcheck" and the type must be checkbox.
+    Hidden from sight, from the tab order and from screen readers, so only a
+    form-filling bot will ever touch it.
+  -->
+  <input
+    type="checkbox"
+    name="botcheck"
+    class="hidden"
+    style="display: none;"
+    tabindex="-1"
+    aria-hidden="true"
+  />
+
+  <div class="form__field">
+    <label for="cf-name">Name</label>
+    <input
+      id="cf-name"
+      type="text"
+      name="name"
+      required
+      autocomplete="name"
+      autocapitalize="words"
+    />
+  </div>
+
+  <div class="form__field">
+    <label for="cf-email">Email</label>
+    <input
+      id="cf-email"
+      type="email"
+      name="email"
+      required
+      autocomplete="email"
+      autocapitalize="off"
+      spellcheck="false"
+      aria-describedby="cf-email-hint"
+    />
+    <p id="cf-email-hint" class="form__hint">So I can reply to you.</p>
+  </div>
+
+  <div class="form__field">
+    <label for="cf-message">Message</label>
+    <textarea id="cf-message" name="message" rows="6" required></textarea>
+  </div>
+
+  <!-- CAPTCHA SLOT
+       The honeypot above plus Web3Forms' own server-side spam check is the
+       free baseline. If real spam gets through, drop a widget in here:
+         · hCaptcha  — free on Web3Forms
+         · Turnstile — needs a paid Web3Forms Pro plan (verified July 2026)
+       Either way the site key goes in the widget and the secret key goes in
+       the Web3Forms dashboard under the form's settings. -->
+
+  <button class="button" type="submit">Send message</button>
+</form>
+
+<style>
+  .form {
+    display: grid;
+    gap: var(--space-m);
+    /* Inputs get a narrower measure than prose — a text field wider than about
+       36rem invites nobody to read what they typed. */
+    max-width: 34rem;
+  }
+
+  .form__field {
+    display: grid;
+    gap: var(--space-3xs);
+  }
+
+  /* Real labels above the field, not placeholder text pretending to be a
+     label — placeholders vanish on focus and are invisible to some assistive
+     tech. */
+  .form__field label {
+    font-weight: 600;
+    font-size: var(--step--1);
+  }
+
+  .form__hint {
+    margin: 0;
+    font-size: var(--step--1);
+    color: var(--c-muted);
+  }
+
+  .form input[type='text'],
+  .form input[type='email'],
+  .form textarea {
+    width: 100%;
+    padding: var(--space-2xs) var(--space-xs);
+    background-color: var(--c-bg);
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius);
+    transition: border-color var(--transition);
+  }
+
+  .form input:hover,
+  .form textarea:hover {
+    border-color: var(--c-muted);
+  }
+
+  .form textarea {
+    resize: vertical;
+    line-height: var(--leading-normal);
+  }
+
+  .form button {
+    justify-self: start;
+  }
+
+  .notice {
+    max-width: 34rem;
+    margin-block-end: var(--space-m);
+    padding: var(--space-xs) var(--space-s);
+    border: 1px solid var(--c-line);
+    border-inline-start: 3px solid var(--c-accent);
+    border-radius: var(--radius);
+    background-color: var(--c-surface);
+    font-size: var(--step--1);
+  }
+</style>

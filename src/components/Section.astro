@@ -1,0 +1,45 @@
+---
+interface Props {
+  /** Anchor id — also the target for the matching nav link. */
+  id?: string;
+  /** Section heading. Omit for an untitled section such as the hero. */
+  title?: string;
+  /** Optional standfirst rendered under the heading. */
+  intro?: string;
+}
+
+const { id, title, intro } = Astro.props;
+
+// Tying the heading id to the section lets aria-labelledby name the region for
+// screen-reader users, so "Work" is announced when they jump to the landmark.
+const headingId = id ? `${id}-heading` : undefined;
+---
+
+<section id={id} class="section" aria-labelledby={headingId}>
+  <div class="wrap">
+    {title && <h2 id={headingId}>{title}</h2>}
+    {intro && <p class="lead section__intro">{intro}</p>}
+    <div class="section__body">
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .section {
+    padding-block: var(--space-2xl);
+  }
+
+  /* Collapse the doubled gap where two sections meet. */
+  .section + .section {
+    padding-block-start: 0;
+  }
+
+  .section__intro {
+    margin-block-start: var(--space-s);
+  }
+
+  .section__body:not(:first-child) {
+    margin-block-start: var(--space-l);
+  }
+</style>

@@ -1,0 +1,369 @@
+/* ==========================================================================
+   Design tokens
+   Plain CSS custom properties — nothing to compile, nothing to configure.
+   Change a value here and it propagates everywhere.
+   ========================================================================== */
+
+:root {
+  /* Dark only — no light variant. Declaring this (rather than "light dark")
+     makes the browser render form fields, scrollbars and the mobile address
+     bar dark too, instead of leaving light-mode chrome around a dark page. */
+  color-scheme: dark;
+
+  /* --- Type scale -------------------------------------------------------
+     Fluid via clamp(): each step interpolates between a small-screen and a
+     large-screen size, so headings resize smoothly with no breakpoints.
+     Bounds are in rem, so a reader who raises their browser font size still
+     gets larger text. Ratio is roughly 1.25 (major third).                */
+  --step--1: clamp(0.833rem, 0.81rem + 0.11vw, 0.9rem);
+  --step-0: clamp(1rem, 0.96rem + 0.20vw, 1.125rem);
+  --step-1: clamp(1.25rem, 1.17rem + 0.39vw, 1.5rem);
+  --step-2: clamp(1.563rem, 1.41rem + 0.76vw, 2rem);
+  --step-3: clamp(1.953rem, 1.69rem + 1.31vw, 2.75rem);
+  --step-4: clamp(2.441rem, 2.00rem + 2.20vw, 3.75rem);
+
+  /* --- Spacing ---------------------------------------------------------
+     One scale for every gap and margin on the site. Using only these keeps
+     the vertical rhythm consistent without any grid framework.            */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-s: 1rem;
+  --space-m: 1.5rem;
+  --space-l: 2.5rem;
+  --space-xl: 4rem;
+  --space-2xl: clamp(4rem, 3rem + 5vw, 7rem);
+
+  /* --- Measure ---------------------------------------------------------
+     Line length is the single highest-leverage readability control. Capping
+     body copy at ~66 characters is what separates a comfortable page from a
+     tiring one on a wide monitor.                                         */
+  --measure: 66ch;
+  --measure-narrow: 34ch;
+  --page-max: 68rem;
+
+  /* --- Fonts -----------------------------------------------------------
+     System stack: zero network requests, zero layout shift, no flash of
+     unstyled text, and it already looks native on every platform. Swap for
+     a self-hosted variable font later if the brand needs one.             */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+
+  --radius: 8px;
+  --transition: 160ms ease;
+}
+
+/* --- Colour ------------------------------------------------------------
+   Dark only, deliberately: the site does not follow prefers-color-scheme.
+   Not pure black — #101012 reduces the halation that light text on #000
+   causes, while still reading as properly dark.
+   Contrast against --c-bg, all comfortably past WCAG AA:
+     text 16.1:1 · muted 7.4:1 · accent 7.6:1 · button label 7.7:1        */
+:root {
+  --c-bg: #101012;
+  --c-surface: #191a1d;
+  --c-text: #ececef;
+  --c-muted: #a0a0ab;
+  --c-line: #2c2d31;
+  --c-accent: #7aa2f7;
+  --c-accent-contrast: #0d0d0f;
+}
+
+/* ==========================================================================
+   Reset
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  /* Stops in-page anchors from landing under the sticky header. */
+  scroll-padding-top: var(--space-xl);
+}
+
+/* Respect the OS "reduce motion" setting: kill smooth scrolling and collapse
+   every transition rather than merely shortening it. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+picture,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+
+h1,
+h2,
+h3,
+h4 {
+  line-height: var(--leading-tight);
+  /* Slight negative tracking stops large system-font headings looking loose. */
+  letter-spacing: -0.021em;
+  font-weight: 600;
+  /* Distributes words evenly instead of leaving one orphan on the last line. */
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--step-4);
+}
+h2 {
+  font-size: var(--step-3);
+}
+h3 {
+  font-size: var(--step-2);
+  letter-spacing: -0.015em;
+}
+h4 {
+  font-size: var(--step-1);
+  letter-spacing: -0.01em;
+}
+
+p,
+li {
+  /* Avoids short final lines without the heavier balancing h1–h4 get. */
+  text-wrap: pretty;
+}
+
+/* Cap the line length of running copy. Applied to the element rather than the
+   container so a wide card or grid can still stretch full width. */
+p,
+blockquote {
+  max-width: var(--measure);
+}
+
+small,
+.text-small {
+  font-size: var(--step--1);
+}
+
+.text-muted {
+  color: var(--c-muted);
+}
+
+/* Lead paragraph — one step up, used directly under an h1. */
+.lead {
+  font-size: var(--step-1);
+  line-height: var(--leading-snug);
+  color: var(--c-muted);
+}
+
+code,
+kbd,
+samp {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background-color: var(--c-surface);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+}
+
+a {
+  color: var(--c-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
+  transition: text-decoration-thickness var(--transition);
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* ==========================================================================
+   Focus and skip link
+   ========================================================================== */
+
+/* :focus-visible rather than :focus, so the ring appears for keyboard users
+   without flashing on every mouse click. */
+:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--space-s);
+  /* Parked off-screen until focused — reachable by keyboard, invisible
+     otherwise. Never display:none, which would remove it from tab order. */
+  top: -5rem;
+  z-index: 100;
+  padding: var(--space-2xs) var(--space-s);
+  background-color: var(--c-accent);
+  color: var(--c-accent-contrast);
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 600;
+  transition: top var(--transition);
+}
+
+.skip-link:focus {
+  top: var(--space-s);
+}
+
+/* Visually hidden but still read by screen readers. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ==========================================================================
+   Layout primitives
+   ========================================================================== */
+
+/* Horizontal container: centres content and holds the gutter. */
+.wrap {
+  width: 100%;
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--space-m);
+}
+
+/* Vertical rhythm via the owl selector — spacing lives between siblings, so
+   no element carries a margin that has to be cancelled at an edge. */
+.stack > * + * {
+  margin-block-start: var(--space-s);
+}
+.stack-m > * + * {
+  margin-block-start: var(--space-m);
+}
+.stack-l > * + * {
+  margin-block-start: var(--space-l);
+}
+
+/* Responsive grid with no media queries: columns fit as many ~17rem tracks as
+   will go, then wrap. */
+.grid-auto {
+  display: grid;
+  gap: var(--space-m);
+  grid-template-columns: repeat(auto-fit, minmax(min(17rem, 100%), 1fr));
+}
+
+main {
+  flex: 1;
+}
+
+/* ==========================================================================
+   Components
+   ========================================================================== */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  padding: 0.7em 1.35em;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background-color: var(--c-accent);
+  color: var(--c-accent-contrast);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    opacity var(--transition),
+    transform var(--transition);
+}
+
+.button:hover {
+  opacity: 0.88;
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+.button--ghost {
+  background-color: transparent;
+  color: var(--c-text);
+  border-color: var(--c-line);
+}
+
+.button--ghost:hover {
+  background-color: var(--c-surface);
+  opacity: 1;
+}
+
+.card {
+  padding: var(--space-m);
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius);
+}
+
+.card h3 {
+  margin-block-end: var(--space-2xs);
+}
+
+/* Cards hold their own measure — the global cap is too wide inside a column. */
+.card p {
+  max-width: none;
+  color: var(--c-muted);
+}
+
+hr {
+  border: 0;
+  border-block-start: 1px solid var(--c-line);
+  margin-block: var(--space-xl);
+}

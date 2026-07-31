@@ -1,0 +1,57 @@
+---
+import { SITE_TITLE, CONTACT_EMAIL, SOCIAL_LINKS } from '../consts';
+
+// Evaluated at build time, so this freezes at whatever year the site was last
+// deployed. Fine for a site that redeploys on every push; if it ever sits
+// untouched across New Year, a rebuild refreshes it.
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="wrap footer__inner">
+    <p class="text-small text-muted">
+      &copy; {year} {SITE_TITLE}
+    </p>
+
+    <ul class="footer__list">
+      <li>
+        <a class="text-small" href={`mailto:${CONTACT_EMAIL}`}>
+          {CONTACT_EMAIL}
+        </a>
+      </li>
+      {
+        SOCIAL_LINKS.map((link) => (
+          <li>
+            <a class="text-small" href={link.href} rel="me noopener">
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    margin-block-start: var(--space-2xl);
+    border-block-start: 1px solid var(--c-line);
+  }
+
+  .footer__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs) var(--space-m);
+    padding-block: var(--space-l);
+  }
+
+  .footer__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-m);
+    list-style: none;
+    padding: 0;
+  }
+</style>

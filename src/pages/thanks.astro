@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/Section.astro';
+
+// Where Web3Forms redirects after a successful submission. noindex because a
+// confirmation page in search results is noise, and it is excluded from the
+// sitemap in astro.config.mjs.
+---
+
+<BaseLayout
+  title="Message sent"
+  description="Your message has been sent."
+  noindex
+>
+  <Section>
+    <div class="stack-m">
+      <h1>Message sent</h1>
+      <p class="lead">
+        {/* TODO: Add your own reply expectation here if you want to commit to
+            one — "expect a reply within two working days" and similar. Left
+            deliberately vague so the template does not promise on your
+            behalf. */}
+        Thanks — your message came through, and you'll get a reply soon.
+      </p>
+      <a class="button button--ghost" href="/">Back to the home page</a>
+    </div>
+  </Section>
+</BaseLayout>

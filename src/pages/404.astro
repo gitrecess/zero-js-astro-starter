@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/Section.astro';
+
+// Cloudflare Pages serves dist/404.html automatically for unmatched paths on a
+// static project — no _routes.json or redirect rule needed.
+---
+
+<BaseLayout title="Page not found" description="That page doesn't exist." noindex>
+  <Section>
+    <div class="stack-m">
+      <h1>Page not found</h1>
+      <p class="lead">
+        That address doesn't match anything here — it may have moved, or the link
+        may be wrong.
+      </p>
+      <a class="button" href="/">Back to the home page</a>
+    </div>
+  </Section>
+</BaseLayout>

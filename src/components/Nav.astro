@@ -1,0 +1,118 @@
+---
+import { SITE_TITLE, NAV_ITEMS } from '../consts';
+---
+
+<header class="header">
+  <div class="wrap header__inner">
+    {/* Brand lockup: an accent tile carrying your initial, plus the lowercase
+        wordmark closed by an accent full stop. Presentation only — SITE_TITLE
+        stays capitalised for <title> and Open Graph. Mark and dot are
+        aria-hidden so the accessible name is just the site name.
+
+        The initial is derived from SITE_TITLE rather than hardcoded, so it
+        follows the name you set in consts.ts with nothing else to change.
+        A flexbox tile rather than an inline SVG <text>: SVG text centring
+        depends on `dominant-baseline`, which browsers still disagree about,
+        and it cannot inherit the system font stack cleanly. */}
+    <a class="header__brand" href="/">
+      <span class="header__mark" aria-hidden="true"
+        >{SITE_TITLE.charAt(0).toUpperCase()}</span
+      >
+      <span
+        >{SITE_TITLE.toLowerCase()}<span
+          class="header__brand-dot"
+          aria-hidden="true">.</span
+        ></span
+      >
+    </a>
+
+    <nav aria-label="Primary">
+      <ul class="header__list">
+        {
+          NAV_ITEMS.map((item) => (
+            <li>
+              <a class="header__link" href={item.href}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  /* No hamburger menu: that would need JavaScript. Instead the nav wraps onto
+     a second row on narrow screens, which stays usable and ships 0 KB. */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-block-end: 1px solid var(--c-line);
+    /* Solid rather than translucent — a blurred backdrop costs GPU work on
+       scroll for a decorative effect. */
+    background-color: var(--c-bg);
+  }
+
+  .header__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs) var(--space-m);
+    padding-block: var(--space-s);
+  }
+
+  .header__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    font-weight: 700;
+    font-size: var(--step-1);
+    letter-spacing: -0.04em;
+    color: var(--c-text);
+    text-decoration: none;
+  }
+
+  /* Sized in em so the mark tracks the fluid brand type size. Inline-flex
+     centring works with any letter, in any font, without the SVG text
+     baseline guesswork. */
+  .header__mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 0.35em;
+    background-color: var(--c-accent);
+    color: var(--c-accent-contrast);
+    /* The tile reads as a mark, not as running text, so it wants its own
+       optical size rather than inheriting the brand's 1.1em. */
+    font-size: 0.7em;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .header__brand-dot {
+    color: var(--c-accent);
+  }
+
+  .header__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-m);
+    list-style: none;
+    padding: 0;
+  }
+
+  .header__link {
+    color: var(--c-muted);
+    text-decoration: none;
+    transition: color var(--transition);
+  }
+
+  .header__link:hover {
+    color: var(--c-text);
+  }
+</style>

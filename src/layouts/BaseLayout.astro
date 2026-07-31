@@ -1,0 +1,88 @@
+---
+import {
+  SITE_TITLE,
+  SITE_DESCRIPTION,
+  SITE_URL,
+  SITE_LOCALE,
+  SITE_NOINDEX,
+} from '../consts';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  /** Page-specific title. Omit on the home page to use the site name alone. */
+  title?: string;
+  /** Page-specific meta description. Falls back to the site description. */
+  description?: string;
+  /**
+   * Path to a social share image in /public. Defaults to the site-wide
+   * 1200×630 card. Pass a page-specific image to override — but never point it
+   * at a file that is not in /public, as a broken og:image is worse than none.
+   */
+  ogImage?: string;
+  /** Keep this page out of search results. Used by /thanks and /404. */
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description = SITE_DESCRIPTION,
+  ogImage = '/og.png',
+  noindex = false,
+} = Astro.props;
+
+// Site-wide suppression (pre-launch) wins over the per-page flag, so flipping
+// SITE_NOINDEX to false cannot accidentally expose /thanks or /404.
+const hideFromSearch = SITE_NOINDEX || noindex;
+
+const pageTitle = title ? `${title} — ${SITE_TITLE}` : SITE_TITLE;
+
+// Built from SITE_URL rather than Astro.site so TypeScript knows it is defined.
+const canonical = new URL(Astro.url.pathname, SITE_URL);
+const ogImageUrl = ogImage ? new URL(ogImage, SITE_URL) : undefined;
+---
+
+<!doctype html>
+<html lang={SITE_LOCALE}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {/* Matches --c-bg, so mobile browser chrome tints to the page instead of
+        leaving a light address bar above a dark site. */}
+    <meta name="theme-color" content="#101012" />
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+    {hideFromSearch && <meta name="robots" content="noindex, nofollow" />}
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {/* Full-bleed square — iOS rounds the corners itself. */}
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE_TITLE} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl.href} />}
+    <meta
+      name="twitter:card"
+      content={ogImageUrl ? 'summary_large_image' : 'summary'}
+    />
+
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Nav />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

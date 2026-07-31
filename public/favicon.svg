@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Placeholder mark: the initial of SITE_TITLE ("Your Name") on a solid
+       accent tile. A line mark thins out to nothing in a browser tab; the tile
+       holds at 16px. Colours mirror the site tokens: accent #7aa2f7,
+       accent-contrast #0d0d0f.
+
+       The letter is drawn as strokes rather than set as <text> on purpose — an
+       SVG favicon has no font fallback, so <text> renders differently (or not
+       at all) depending on what the client has available.
+
+       TODO: Replace this with your own mark, then regenerate the raster set so
+       favicon.ico and apple-touch-icon.png match. Rasterise this file to a
+       180x180 PNG with something that actually implements SVG — rsvg-convert,
+       Inkscape, or any browser's screenshot mode. Note that ImageMagick's
+       built-in MSVG renderer silently drops strokes unless an rsvg delegate is
+       installed, so `magick favicon.svg out.png` is not trustworthy here.
+       Once you have the PNG:
+         magick apple-touch-icon.png -define icon:auto-resize=32,16 favicon.ico -->
+  <rect width="200" height="200" rx="47" fill="#7aa2f7"/>
+  <path d="M 62,56 L 100,102 L 138,56 M 100,102 L 100,144"
+        fill="none" stroke="#0d0d0f" stroke-width="26"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
