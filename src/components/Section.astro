@@ -12,7 +12,9 @@ const { id, title, intro } = Astro.props;
 
 // Tying the heading id to the section lets aria-labelledby name the region for
 // screen-reader users, so "Work" is announced when they jump to the landmark.
-const headingId = id ? `${id}-heading` : undefined;
+// Both are required: aria-labelledby pointing at an element that was never
+// rendered is worse than no label at all, and the h2 only renders with a title.
+const headingId = id && title ? `${id}-heading` : undefined;
 ---
 
 <section id={id} class="section" aria-labelledby={headingId}>

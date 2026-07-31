@@ -36,11 +36,15 @@ const redirectUrl = new URL('/thanks', SITE_URL).href;
     The name must be exactly "botcheck" and the type must be checkbox.
     Hidden from sight, from the tab order and from screen readers, so only a
     form-filling bot will ever touch it.
+
+    The inline style is load-bearing, not a tidy-up candidate: there is no
+    .hidden class in global.css, so removing it shows the checkbox to real
+    people, who will not tick it — and every genuine submission still arrives.
+    The spam filter simply stops working, silently.
   -->
   <input
     type="checkbox"
     name="botcheck"
-    class="hidden"
     style="display: none;"
     tabindex="-1"
     aria-hidden="true"
@@ -90,66 +94,11 @@ const redirectUrl = new URL('/thanks', SITE_URL).href;
 </form>
 
 <style>
-  .form {
-    display: grid;
-    gap: var(--space-m);
-    /* Inputs get a narrower measure than prose — a text field wider than about
-       36rem invites nobody to read what they typed. */
-    max-width: 34rem;
-  }
-
-  .form__field {
-    display: grid;
-    gap: var(--space-3xs);
-  }
-
-  /* Real labels above the field, not placeholder text pretending to be a
-     label — placeholders vanish on focus and are invisible to some assistive
-     tech. */
-  .form__field label {
-    font-weight: 600;
-    font-size: var(--step--1);
-  }
-
-  .form__hint {
-    margin: 0;
-    font-size: var(--step--1);
-    color: var(--c-muted);
-  }
-
-  .form input[type='text'],
-  .form input[type='email'],
-  .form textarea {
-    width: 100%;
-    padding: var(--space-2xs) var(--space-xs);
-    background-color: var(--c-bg);
-    border: 1px solid var(--c-line);
-    border-radius: var(--radius);
-    transition: border-color var(--transition);
-  }
-
-  .form input:hover,
-  .form textarea:hover {
-    border-color: var(--c-muted);
-  }
-
-  .form textarea {
-    resize: vertical;
-    line-height: var(--leading-normal);
-  }
-
-  .form button {
-    justify-self: start;
-  }
-
+  /* `.form`, `.form__field`, the input styling and `.notice` all live in
+     global.css, so any other form you add picks them up for free. The only
+     thing local to this component is the gap between the notice and the form,
+     which nothing else needs. */
   .notice {
-    max-width: 34rem;
     margin-block-end: var(--space-m);
-    padding: var(--space-xs) var(--space-s);
-    border: 1px solid var(--c-line);
-    border-inline-start: 3px solid var(--c-accent);
-    border-radius: var(--radius);
-    background-color: var(--c-surface);
-    font-size: var(--step--1);
   }
 </style>

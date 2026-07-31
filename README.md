@@ -23,7 +23,9 @@ nothing in the `<script>` budget at all, because the constraints are the point:
 - **Dark only, deliberately.** The site declares `color-scheme: dark` rather than
   following `prefers-color-scheme`, so form controls, scrollbars and mobile
   browser chrome all follow the page instead of framing it in light-mode UI.
-- **WCAG AA throughout.** Every colour pairing clears AA; the lowest is 7.4:1.
+- **WCAG AA throughout.** Every text pairing clears 6.9:1 where AA asks for
+  4.5:1, measured on the card background as well as the page. Interactive
+  borders meet the separate 3:1 minimum AA sets for non-text contrast.
   `prefers-reduced-motion` and `:focus-visible` are handled globally.
 - **Fluid type and spacing via `clamp()`.** One type scale and one spacing scale,
   both interpolating with the viewport, so there are no breakpoints to maintain.

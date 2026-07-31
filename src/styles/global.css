@@ -64,16 +64,39 @@
    Dark only, deliberately: the site does not follow prefers-color-scheme.
    Not pure black — #101012 reduces the halation that light text on #000
    causes, while still reading as properly dark.
-   Contrast against --c-bg, all comfortably past WCAG AA:
-     text 16.1:1 · muted 7.4:1 · accent 7.6:1 · button label 7.7:1        */
+   Every text pairing clears 6.9:1, against a WCAG AA floor of 4.5:1. The
+   figures are listed per background, and EVERY colour appears on both lines,
+   because links, muted copy and status text all sit on --c-surface inside
+   cards as well as on the page. Measuring only against --c-bg, or omitting a
+   colour from the surface row, is what lets a stated floor quietly stop being
+   true — it has happened twice here:
+     on --c-bg       text 16.1 · muted 8.2 · accent 7.6 · ok 9.9 · warn 9.8
+                     bad 8.0 · button label on accent 7.7
+     on --c-surface  text 14.8 · muted 7.5 · accent 6.9 · ok 9.1 · warn 8.9
+                     bad 7.3
+   The floor is accent-on-surface at 6.9 — a link inside a card. --c-accent is
+   the brand colour and is deliberately not tuned to chase a rounder number.
+
+   Colour never carries the meaning on its own — every status is also spelled
+   out as a word ("Pass", "Warn", "Fail", "Error") next to it.
+
+   --c-line is decorative only — card edges, rules, the notice border. Any
+   border that is the visual boundary of an interactive control uses
+   --c-line-strong instead, which clears the 3:1 that WCAG 1.4.11 requires
+   of a component boundary, on both backgrounds.                          */
 :root {
   --c-bg: #101012;
   --c-surface: #191a1d;
   --c-text: #ececef;
-  --c-muted: #a0a0ab;
+  --c-muted: #a9a9b4;
   --c-line: #2c2d31;
+  --c-line-strong: #6a6b74;
   --c-accent: #7aa2f7;
   --c-accent-contrast: #0d0d0f;
+
+  --c-ok: #6fce96;
+  --c-warn: #e0b35c;
+  --c-bad: #f08c8c;
 }
 
 /* ==========================================================================
@@ -140,6 +163,18 @@ textarea,
 select {
   font: inherit;
   color: inherit;
+}
+
+/* A fieldset is the right element for grouping radios, but its default border,
+   padding and legend positioning belong to 1997. Reset both here so grouping
+   stays semantic without costing anything visually. */
+fieldset {
+  padding: 0;
+  border: 0;
+}
+
+legend {
+  padding: 0;
 }
 
 /* ==========================================================================
@@ -334,10 +369,12 @@ main {
   transform: translateY(1px);
 }
 
+/* The outline is the only thing marking this as a control, so it takes the
+   3:1 border rather than the decorative one. */
 .button--ghost {
   background-color: transparent;
   color: var(--c-text);
-  border-color: var(--c-line);
+  border-color: var(--c-line-strong);
 }
 
 .button--ghost:hover {
@@ -366,4 +403,93 @@ hr {
   border: 0;
   border-block-start: 1px solid var(--c-line);
   margin-block: var(--space-xl);
+}
+
+/* ==========================================================================
+   Forms
+   Shared by the contact form and every tool page, so these live here rather
+   than in one component's scoped block.
+   ========================================================================== */
+
+.form {
+  display: grid;
+  gap: var(--space-m);
+  /* Inputs get a narrower measure than prose — a text field wider than about
+     36rem invites nobody to read what they typed. */
+  max-width: 34rem;
+}
+
+.form__field {
+  display: grid;
+  gap: var(--space-3xs);
+}
+
+/* Real labels above the field, not placeholder text pretending to be a label —
+   placeholders vanish on focus and are invisible to some assistive tech. */
+.form__field label {
+  font-weight: 600;
+  font-size: var(--step--1);
+}
+
+.form__hint {
+  margin: 0;
+  font-size: var(--step--1);
+  color: var(--c-muted);
+}
+
+/* Everything except checkboxes and radios, which want their native look, and
+   hidden inputs, which want nothing at all. */
+/* The field background matches the page, so this border is the only thing
+   showing where the control is — it uses --c-line-strong to clear the 3:1
+   WCAG 1.4.11 asks of a component boundary. The decorative --c-line would be
+   1.4:1 here, leaving the fields all but invisible at rest. */
+.form input:not([type='checkbox'], [type='radio'], [type='hidden']),
+.form select,
+.form textarea {
+  width: 100%;
+  padding: var(--space-2xs) var(--space-xs);
+  background-color: var(--c-bg);
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--radius);
+  transition: border-color var(--transition);
+}
+
+.form input:not([type='checkbox'], [type='radio'], [type='hidden']):hover,
+.form select:hover,
+.form textarea:hover {
+  border-color: var(--c-muted);
+}
+
+.form textarea {
+  resize: vertical;
+  line-height: var(--leading-normal);
+}
+
+.form button {
+  justify-self: start;
+}
+
+/* A disabled control means "not yet" rather than "broken" — the tool pages
+   render their submit button disabled and let JavaScript enable it. */
+.form button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* An aside about the form next to it: the contact form's "not wired up" warning
+   and every tool page's <noscript> fallback. Spacing is left to the surrounding
+   stack, so this only carries its own appearance. */
+.notice {
+  max-width: 34rem;
+  padding: var(--space-xs) var(--space-s);
+  border: 1px solid var(--c-line);
+  border-inline-start: 3px solid var(--c-accent);
+  border-radius: var(--radius);
+  background-color: var(--c-surface);
+  font-size: var(--step--1);
+}
+
+/* For a notice making a promise rather than an apology. */
+.notice--good {
+  border-inline-start-color: var(--c-ok);
 }
