@@ -29,7 +29,7 @@ const services: { title: string; body: string }[] = [
     <div class="hero stack-m">
       {/* TODO: What you do, in one sentence. Keep it under about 12 words —
           the heading is capped at 22ch so it stacks into strong lines. */}
-      <h1>I build things for the web, end to end</h1>
+      <h1>I do things, end to end</h1>
       <p class="lead">
         {/* TODO: Two or three sentences expanding the headline. Who you help,
             what you take on, and where a project ends up. */}
@@ -45,10 +45,14 @@ const services: { title: string; body: string }[] = [
   </Section>
 
   {/* --- Services -------------------------------------------------------- */}
+  {/* TODO: One line framing the three cards below — how you are usually
+      brought in, and that most projects mix them. The `intro` prop takes a
+      plain string, so this marker lives here rather than in the rendered
+      text; `grep -rn "TODO:" src/` still finds it. */}
   <Section
     id="services"
     title="What I do"
-    intro="TODO: One line framing the three cards below — how you are usually brought in, and that most projects mix them."
+    intro="Most engagements start in one of these three places, and most projects end up mixing them."
   >
     <ul class="grid-auto cards">
       {
@@ -84,10 +88,12 @@ const services: { title: string; body: string }[] = [
   </Section>
 
   {/* --- Contact --------------------------------------------------------- */}
+  {/* TODO: Tell people what to include in their message, and what happens
+      next. Setting expectations reduces the back-and-forth. */}
   <Section
     id="contact"
     title="Get in touch"
-    intro="TODO: Tell people what to include in their message, and what happens next. Setting expectations reduces the back-and-forth."
+    intro="Tell me what you are trying to build and roughly when you need it. I read every message and reply myself."
   >
     <ContactForm />
     <p class="text-small text-muted contact__alt">
