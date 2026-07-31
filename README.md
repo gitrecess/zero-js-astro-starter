@@ -28,7 +28,10 @@ nothing in the `<script>` budget at all, because the constraints are the point:
   borders meet the separate 3:1 minimum AA sets for non-text contrast.
   `prefers-reduced-motion` and `:focus-visible` are handled globally.
 - **Fluid type and spacing via `clamp()`.** One type scale and one spacing scale,
-  both interpolating with the viewport, so there are no breakpoints to maintain.
+  both interpolating with the viewport, so the layout needs no breakpoints. The
+  one width media query in the codebase is not a layout one — it sits in
+  `Nav.astro` and offsets in-page anchors against the sticky header, whose height
+  steps when the nav wraps to a second row.
 - **A launch switch that actually works.** One flag hides the whole site from
   search engines — see [Going live](#going-live), which explains the part most
   people get wrong.
@@ -86,6 +89,14 @@ then work through the page itself. Every placeholder is marked:
 ```sh
 grep -rn "TODO:" src/
 ```
+
+If your name is much longer than the placeholder, check one thing after setting
+it: the nav wraps to a second row on narrow screens, and in-page anchors are
+offset against that. Narrow your browser until the nav wraps, note the width, and
+make sure the `27rem` breakpoint on `--header-offset` in
+`src/components/Nav.astro` sits above it — otherwise the header will cover
+headings you jump to from the nav. The comment on that rule explains it, and it
+is marked `TODO:` so the placeholder sweep finds it.
 
 **2. The mark.** The nav brand derives its letter from `SITE_TITLE`, so it follows
 your name automatically. The favicon set in `public/` is static and does not —

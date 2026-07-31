@@ -46,13 +46,17 @@ export const CONTACT_EMAIL = 'you@example.com';
 export const CONTACT_SUBJECT = 'New enquiry from your website';
 
 /**
- * Primary navigation. In-page anchors because the site is a single page — swap
- * to real paths (e.g. '/services') if it grows into several.
+ * Primary navigation. The targets are sections of the home page, so the hrefs
+ * are root-relative ('/#about') rather than bare fragments ('#about'): the nav
+ * renders on every page, and a bare fragment would resolve against whatever
+ * document the visitor is on — dead links on /thanks and /404. On the home page
+ * itself this is still a same-document navigation, so scrolling is unchanged.
+ * Swap to real paths (e.g. '/services') if the site grows past one page.
  */
 export const NAV_ITEMS = [
-  { href: '#services', label: 'Services' },
-  { href: '#about', label: 'About' },
-  { href: '#contact', label: 'Contact' },
+  { href: '/#services', label: 'Services' },
+  { href: '/#about', label: 'About' },
+  { href: '/#contact', label: 'Contact' },
 ] as const;
 
 /**

@@ -70,7 +70,7 @@
    cards as well as on the page. Measuring only against --c-bg, or omitting a
    colour from the surface row, is what lets a stated floor quietly stop being
    true — it has happened twice here:
-     on --c-bg       text 16.1 · muted 8.2 · accent 7.6 · ok 9.9 · warn 9.8
+     on --c-bg       text 16.1 · muted 8.2 · accent 7.5 · ok 9.9 · warn 9.8
                      bad 8.0 · button label on accent 7.7
      on --c-surface  text 14.8 · muted 7.5 · accent 6.9 · ok 9.1 · warn 8.9
                      bad 7.3
@@ -116,8 +116,16 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
-  /* Stops in-page anchors from landing under the sticky header. */
-  scroll-padding-top: var(--space-xl);
+  /* Stops in-page anchors from landing under the sticky header. The amount is
+     --header-offset, declared in Nav.astro rather than here: the header has two
+     heights, because the nav wraps to a second row instead of collapsing into a
+     hamburger, and the width at which it wraps depends on how wide the wordmark
+     and the nav labels are. That is the nav's business, not this file's, and it
+     is the one number here that legitimately differs per site.
+
+     The fallback is the taller, wrapped case, so if the declaration ever goes
+     missing this overshoots rather than hiding the heading behind the header. */
+  scroll-padding-top: var(--header-offset, 6.75rem);
 }
 
 /* Respect the OS "reduce motion" setting: kill smooth scrolling and collapse

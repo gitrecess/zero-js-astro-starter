@@ -42,6 +42,35 @@ import { SITE_TITLE, NAV_ITEMS } from '../consts';
   </div>
 </header>
 
+{/* Global because it feeds `scroll-padding-top` on <html>, which a scoped rule
+    cannot reach — and it belongs to this component, not to global.css, because
+    the number is a property of this header. */}
+<style is:global>
+  /* Clearance for in-page anchors under the sticky header, consumed by
+     `scroll-padding-top` in global.css. The header has two heights: measured,
+     103px with the nav wrapped onto a second row, and 66–71px on one row (that
+     range is the fluid brand type, which stops growing at 1353px). Each value
+     below clears its case by ~5px.
+
+     TODO: the breakpoint is where the nav wraps, which depends on how wide your
+     wordmark and nav labels are. 27rem is measured for the placeholder name
+     ("Your Name" wraps at or below 414px) — set SITE_TITLE, then narrow the
+     browser until the nav drops to a second row and raise this above that width
+     if it needs it. Too low is the harmful direction, because the header then
+     covers the heading you jumped to; too high only leaves extra space above
+     it. A single clamp() cannot express this — the height steps down when the
+     nav stops wrapping, and clamp() is monotonic. */
+  :root {
+    --header-offset: 6.75rem;
+  }
+
+  @media (min-width: 27rem) {
+    :root {
+      --header-offset: 4.75rem;
+    }
+  }
+</style>
+
 <style>
   /* No hamburger menu: that would need JavaScript. Instead the nav wraps onto
      a second row on narrow screens, which stays usable and ships 0 KB. */
