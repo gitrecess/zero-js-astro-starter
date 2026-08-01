@@ -90,7 +90,16 @@ const redirectUrl = new URL('/thanks', SITE_URL).href;
        Either way the site key goes in the widget and the secret key goes in
        the Web3Forms dashboard under the form's settings. -->
 
-  <button class="button" type="submit">Send message</button>
+  <!--
+    Disabled while the key is missing, and the notice above is the other half of
+    it: without this the form still POSTs, Web3Forms rejects a keyless
+    submission, and the visitor's message is gone. A disabled button on its own
+    would be mute — the notice is what says why, so keep the two together.
+
+    `.form button[disabled]` in global.css already styles this state; nothing
+    new is needed there.
+  -->
+  <button class="button" type="submit" disabled={!accessKey}>Send message</button>
 </form>
 
 <style>

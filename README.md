@@ -143,8 +143,9 @@ Set `PUBLIC_WEB3FORMS_KEY`:
 - locally — copy `.env.example` to `.env` and fill it in
 - in production — your host's environment variables
 
-Until it is set, the form renders a visible "not wired up" notice rather than
-failing silently, so you cannot ship a dead form by accident.
+Until it is set, the form renders a visible "not wired up" notice and its Send
+button stays disabled, rather than failing silently — so a form that is not
+wired up cannot swallow a visitor's message.
 
 The key is public by design; it appears in the page source of every Web3Forms
 site. The env var gives it one home, not secrecy — don't put anything genuinely
@@ -154,6 +155,32 @@ Spam protection is the `botcheck` honeypot plus Web3Forms' own server-side check
 both free. Note that **Turnstile requires a paid Web3Forms Pro plan**; free
 hCaptcha is the fallback if spam becomes a real problem. There is a marked
 `CAPTCHA SLOT` in `src/components/ContactForm.astro` for either.
+
+**Worth knowing what the honeypot does not cover.** It is markup, so it only sees
+a bot that loads the page and fills the form in. Since the key is public, the
+cheaper abuse is to read it out of your page source and POST it straight to
+`api.web3forms.com/submit` — a path that renders nothing, so the honeypot is not
+in the way of it. What that costs is your **quota** rather than your patience:
+250 submissions a month on the free plan, after which genuine messages stop
+arriving.
+
+**A captcha does cover it, and that is the trade this template is making.**
+Enabling hCaptcha in the Web3Forms dashboard makes a valid captcha token
+[mandatory on every submission](https://docs.web3forms.com/getting-started/customizations/spam-protection/hcaptcha)
+— it is checked server-side, so a scripted POST with no token is rejected too.
+It is free. **The catch is the page cost:** it needs
+`<script src="https://web3forms.com/client/script.js" async defer></script>`,
+which is a third-party script on every page and the one change that breaks this
+template's premise. So the `CAPTCHA SLOT` is a real fix held back for a real
+reason, not a fix that would not work — if a zero-JS budget is not sacred to your
+project, turn it on.
+
+Restricting the key to your own domain is the other option and it is weaker than
+it sounds: it is a
+[Pro feature](https://docs.web3forms.com/getting-started/pro-features/restrict-to-domain),
+it stops the form working locally, and it can only check `Origin`/`Referer` —
+headers a scripted client sets to whatever it likes. Web3Forms' own wording is
+that it "will *potentially* reduce spam attacks".
 
 ## Deploy
 
@@ -200,8 +227,13 @@ Things that look like omissions but are choices:
 - **Dark only.** A light theme is not a missing feature. Supporting both doubles
   the surface you have to keep accessible for a page this small.
 - **A honeypot, not a captcha.** The `botcheck` field costs nothing, blocks the
-  bots that actually target static contact forms, and asks nothing of your
-  visitors. Escalate to hCaptcha only if real spam arrives.
+  form-filling bots that target static contact forms, and asks nothing of your
+  visitors. **The reason it is not a captcha is the no-JavaScript rule above, not
+  effectiveness** — Web3Forms' free hCaptcha is enforced server-side and would
+  also cover the direct-POST path the honeypot cannot see, but it needs a
+  third-party `<script>` on every page. That is the trade; § Contact form spells
+  it out. Escalate if real spam arrives and you would rather have the protection
+  than the empty script budget.
 - **`robots.txt` is a generated route**, not a file in `public/`, precisely so it
   cannot drift out of step with `SITE_NOINDEX`.
 - **Plain CSS with custom properties.** No Tailwind, no preprocessor. Tokens in
