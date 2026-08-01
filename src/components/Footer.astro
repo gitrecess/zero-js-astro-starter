@@ -9,8 +9,11 @@ const year = new Date().getFullYear();
 
 <footer class="footer">
   <div class="wrap footer__inner">
+    {/* Lowercased for presentation, matching the nav wordmark, which does the
+        same. SITE_TITLE stays capitalised in consts.ts for <title> and Open
+        Graph. Change both together if you want a capitalised look. */}
     <p class="text-small text-muted">
-      &copy; {year} {SITE_TITLE}
+      &copy; {year} {SITE_TITLE.toLowerCase()}
     </p>
 
     <ul class="footer__list">
