@@ -29,9 +29,9 @@ nothing in the `<script>` budget at all, because the constraints are the point:
   `prefers-reduced-motion` and `:focus-visible` are handled globally.
 - **Fluid type and spacing via `clamp()`.** One type scale and one spacing scale,
   both interpolating with the viewport, so the layout needs no breakpoints. The
-  one width media query in the codebase is not a layout one — it sits in
+  one width media query the template ships is not a layout one — it sits in
   `Nav.astro` and offsets in-page anchors against the sticky header, whose height
-  steps when the nav wraps to a second row.
+  steps at every point the header wraps.
 - **A launch switch that actually works.** One flag hides the whole site from
   search engines — see [Going live](#going-live), which explains the part most
   people get wrong.
@@ -84,19 +84,29 @@ type-check and is the only verification step.
 
 **1. Copy.** Everything site-wide lives in `src/consts.ts` — title, description,
 canonical origin, locale, contact address, nav items, social links. Start there,
-then work through the page itself. Every placeholder is marked:
+then work through the page itself. Every editable placeholder is marked `TODO:`,
+and two of them sit outside `src/` — the domain in `astro.config.mjs` and the
+mark in `public/favicon.svg` — so sweep all three paths:
 
 ```sh
-grep -rn "TODO:" src/
+grep -rn "TODO:" src astro.config.mjs public
 ```
 
-If your name is much longer than the placeholder, check one thing after setting
-it: the nav wraps to a second row on narrow screens, and in-page anchors are
-offset against that. Narrow your browser until the nav wraps, note the width, and
-make sure the `27rem` breakpoint on `--header-offset` in
-`src/components/Nav.astro` sits above it — otherwise the header will cover
-headings you jump to from the nav. The comment on that rule explains it, and it
-is marked `TODO:` so the placeholder sweep finds it.
+The one placeholder no marker can reach is `public/og.png`: it is binary, so
+step 2 below is its only reminder.
+
+If your name is much longer than the placeholder, or you add a nav item, check
+the sticky header before you ship. It wraps as the viewport narrows and its
+height steps at every wrap point; in-page anchors are offset against that by
+`--header-offset` in `src/components/Nav.astro`. Narrow your browser and watch
+**two** widths, not one: where the nav drops below the brand, and where the nav's
+own list wraps onto a second line. The three labels shipped here only ever do the
+first, which is why two values are enough for them — a longer wordmark or a
+fourth label can add the second, and that is a third height needing a third value
+and another media query. Too low a breakpoint is the harmful direction, because
+the header then covers the heading you jumped to. The comment on that rule has
+the measurements and the method, and it is marked `TODO:` so the placeholder
+sweep finds it.
 
 **2. The mark.** The nav brand derives its letter from `SITE_TITLE`, so it follows
 your name automatically. The favicon set in `public/` is static and does not —

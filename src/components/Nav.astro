@@ -47,19 +47,44 @@ import { SITE_TITLE, NAV_ITEMS } from '../consts';
     the number is a property of this header. */}
 <style is:global>
   /* Clearance for in-page anchors under the sticky header, consumed by
-     `scroll-padding-top` in global.css. The header has two heights: measured,
-     103px with the nav wrapped onto a second row, and 66–71px on one row (that
-     range is the fluid brand type, which stops growing at 1353px). Each value
-     below clears its case by ~5px.
+     `scroll-padding-top` in global.css. The header wraps as the viewport
+     narrows and its height steps at every wrap point, so how many heights it
+     has is a property of your nav — not a fixed two. With the placeholder name
+     and the three labels this template ships it is two, measured:
 
-     TODO: the breakpoint is where the nav wraps, which depends on how wide your
-     wordmark and nav labels are. 27rem is measured for the placeholder name
-     ("Your Name" wraps at or below 414px) — set SITE_TITLE, then narrow the
-     browser until the nav drops to a second row and raise this above that width
-     if it needs it. Too low is the harmful direction, because the header then
-     covers the heading you jumped to; too high only leaves extra space above
-     it. A single clamp() cannot express this — the height steps down when the
-     nav stops wrapping, and clamp() is monotonic. */
+       ≤ 414px   102.6–103.4px   brand and nav on separate rows
+       ≥ 416px   65.5–71.4px     one row; the range is the fluid brand type,
+                                 which stops growing at 1353px
+
+     Each value below clears its case by at least 4.6px. Note the breakpoint is
+     27rem (432px), not the 416px where the header actually stops wrapping — it
+     is rounded UP from the measured transition, and up is the safe direction:
+     too high only leaves extra space above the heading you jumped to, too low
+     lets the header cover it outright.
+
+     TODO: re-measure after setting SITE_TITLE and NAV_ITEMS, and watch TWO
+     widths rather than one:
+
+       1. where the nav drops below the brand — raise the 27rem breakpoint above
+          it if it moved;
+       2. where the nav's OWN list wraps onto a second line. That is a third,
+          taller state and two values cannot express it. The bare `:root` rule
+          below is the tallest case: raise it to clear the wrapped-list height,
+          then add a `min-width` query between it and the 27rem one for the
+          middle case, mirroring how the two below already step down.
+
+     Checking only (1) is the trap, and it is not hypothetical. Swapping in a
+     longer name and a fourth label — "Alexandra Montgomery", with Work ·
+     Services · About · Contact — moves the single-row point from 416px out to
+     600px, makes the nav's own list wrap below 322px, and below 286px wraps the
+     wordmark too, for a fourth state at 184.2px. Left at the values below, that
+     nav puts the header over the heading at 105 of 168 widths sampled between
+     280px and 2560px: by ~28px through the whole 432–598px band, by 44px where
+     the list wraps, and by 76px where the wordmark wraps as well. Four states,
+     from a change to two constants in consts.ts.
+
+     A single clamp() cannot express any of this: the height steps down at each
+     wrap point and clamp() is monotonic. */
   :root {
     --header-offset: 6.75rem;
   }
