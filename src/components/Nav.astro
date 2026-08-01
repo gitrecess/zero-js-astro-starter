@@ -27,7 +27,12 @@ import { SITE_TITLE, NAV_ITEMS } from '../consts';
     </a>
 
     <nav aria-label="Primary">
-      <ul class="header__list">
+      {/* `role="list"` is NOT redundant — keep it, and add it to any list you
+          add. WebKit drops the implicit list role from a `<ul>` whose
+          `list-style` is `none`, so VoiceOver stops announcing "list, N items";
+          the role restores it. Every `<ul>` in this template removes its
+          bullets, so every one carries this. */}
+      <ul class="header__list" role="list">
         {
           NAV_ITEMS.map((item) => (
             <li>
