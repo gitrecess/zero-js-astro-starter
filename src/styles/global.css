@@ -117,14 +117,19 @@ html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
   /* Stops in-page anchors from landing under the sticky header. The amount is
-     --header-offset, declared in Nav.astro rather than here: the header has two
-     heights, because the nav wraps to a second row instead of collapsing into a
-     hamburger, and the width at which it wraps depends on how wide the wordmark
-     and the nav labels are. That is the nav's business, not this file's, and it
-     is the one number here that legitimately differs per site.
+     --header-offset, declared in Nav.astro rather than here: the nav wraps
+     instead of collapsing into a hamburger, and the header's height steps at
+     every wrap point — so how many heights it has is a property of that nav
+     rather than a fixed number, and the widths it changes at depend on how
+     wide the wordmark and the labels are. That is the nav's business, not this
+     file's, and it is the one number here that legitimately differs per site.
 
-     The fallback is the taller, wrapped case, so if the declaration ever goes
-     missing this overshoots rather than hiding the heading behind the header. */
+     The fallback is a last resort, not a measurement. It is a single constant
+     while the real clearance is whatever the nav measures, so expect it to be
+     wrong in either direction: too much only leaves a gap above the heading you
+     jumped to, too little lets the header cover it outright. If it ever takes
+     effect, restore the declaration in Nav.astro rather than tuning this
+     number. */
   scroll-padding-top: var(--header-offset, 6.75rem);
 }
 
@@ -415,8 +420,8 @@ hr {
 
 /* ==========================================================================
    Forms
-   Shared by the contact form and every tool page, so these live here rather
-   than in one component's scoped block.
+   Form primitives rather than one component's styles, so they live here and
+   any form can use them instead of being locked into a scoped block.
    ========================================================================== */
 
 .form {
@@ -477,16 +482,17 @@ hr {
   justify-self: start;
 }
 
-/* A disabled control means "not yet" rather than "broken" — the tool pages
-   render their submit button disabled and let JavaScript enable it. */
+/* A disabled control means "not yet" rather than "broken": it dims and refuses
+   the pointer rather than reading as an error. For any form that gates its
+   submit until the input is usable. */
 .form button[disabled] {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* An aside about the form next to it: the contact form's "not wired up" warning
-   and every tool page's <noscript> fallback. Spacing is left to the surrounding
-   stack, so this only carries its own appearance. */
+/* An aside about the form next to it: the contact form's "not wired up"
+   warning, or a <noscript> fallback beside anything that needs one. Spacing is
+   left to the surrounding stack, so this only carries its own appearance. */
 .notice {
   max-width: 34rem;
   padding: var(--space-xs) var(--space-s);
