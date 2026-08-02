@@ -9,8 +9,24 @@ import { SITE_TITLE, SITE_URL, CONTACT_SUBJECT } from '../consts';
  * The access key is PUBLIC by design — it sits in the page source of every
  * Web3Forms site. The env var exists so there is one place to set it, not to
  * keep it secret.
+ *
+ * `.trim()` fixes two different inputs with two different symptoms, and they
+ * are worth keeping apart:
+ *
+ *   1. A WHITESPACE-ONLY value defeats the guard. " " is truthy, so the notice
+ *      below does not render and the Send button ships enabled — a dead form in
+ *      exactly the way that pair exists to prevent. An empty value was always
+ *      caught correctly.
+ *   2. A PADDED REAL key defeats the submission instead. The guard behaves
+ *      correctly there (a key is present, so the button is rightly enabled),
+ *      but "  abc  " went into access_key verbatim and Web3Forms rejects it.
+ *
+ * The second is the realistic one: a host's environment-variable UI is where a
+ * trailing space or newline survives copy-paste and is invisible in the field.
+ * Note a local `.env` mostly cannot reach case 1 — Vite's dotenv trims unquoted
+ * values, so only a quoted `PUBLIC_WEB3FORMS_KEY=" "` gets through.
  */
-const accessKey = import.meta.env.PUBLIC_WEB3FORMS_KEY;
+const accessKey = import.meta.env.PUBLIC_WEB3FORMS_KEY?.trim();
 const redirectUrl = new URL('/thanks', SITE_URL).href;
 ---
 
