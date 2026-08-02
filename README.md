@@ -203,6 +203,10 @@ do, make the apex canonical so it matches `site` in `astro.config.mjs`, and send
 `src/pages/404.astro` builds to `dist/404.html`, which Pages serves automatically
 for unmatched paths on a static project — no `_routes.json` needed.
 
+`public/_headers` ships a CSP and the usual hardening headers, read by Pages and
+by Netlify. Its `script-src 'none'` is the zero-JS budget enforced rather than
+asserted, so adding a script means widening it — the comments in the file say how.
+
 ## Going live
 
 The site ships **hidden from search engines**. `SITE_NOINDEX` in `src/consts.ts`

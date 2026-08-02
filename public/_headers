@@ -1,0 +1,35 @@
+# Security headers. Cloudflare Pages and Netlify both read this file from the
+# build output root; Astro copies public/ there verbatim, so nothing else has to
+# know about it. Neither host serves the file itself.
+#
+# script-src 'none' is not caution — it is this template's headline claim,
+# enforced. There is no <script> anywhere in src/, and `npm run build` puts no
+# .js in dist/. Pinning that in the policy means an added script fails loudly in
+# the browser instead of quietly costing you the thing you picked this template
+# for. If you decide to add one, widen this deliberately: a hosted file is
+# 'self', a third-party snippet is its origin, and an inline block needs a
+# 'sha256-...' of its exact contents.
+#
+# form-action lists Web3Forms because the contact form is a native POST to it,
+# and 'self' because Web3Forms redirects back to /thanks afterwards — browsers
+# apply form-action across that redirect, so dropping 'self' breaks the thank-you
+# page rather than the submission. Swap the origin if you swap form backends.
+#
+# style-src allows inline styles: Astro inlines small stylesheets as <style>, and
+# the contact form's honeypot field is hidden with a style attribute. Hashing
+# either would rotate on every CSS edit for very little on a site with no
+# user-supplied HTML.
+#
+# No site origin appears below, deliberately — 'self' covers it. That is what
+# lets this file be identical on main and on the demo branch.
+#
+# HSTS carries no includeSubDomains: on a subdomain deploy it would bind sibling
+# subdomains you may not control or serve over HTTPS. Add it once you know it is
+# true for the whole domain.
+
+/*
+  Content-Security-Policy: default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; script-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'none'; form-action 'self' https://api.web3forms.com
+  Referrer-Policy: no-referrer
+  X-Content-Type-Options: nosniff
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000

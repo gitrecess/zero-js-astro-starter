@@ -2,6 +2,9 @@
 dist/
 # generated types
 .astro/
+# local cache from `npx wrangler pages dev dist`, if you use it to check the
+# headers in public/_headers — `npm run preview` does not read that file
+.wrangler/
 
 # dependencies
 node_modules/
