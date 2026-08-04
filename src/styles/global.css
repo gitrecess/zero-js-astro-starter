@@ -70,7 +70,7 @@
    cards as well as on the page. Measuring only against --c-bg, or omitting a
    colour from the surface row, is what lets a stated floor quietly stop being
    true — it has happened twice here:
-     on --c-bg       text 16.1 · muted 8.2 · accent 7.5 · ok 9.9 · warn 9.8
+     on --c-bg       text 16.1 · muted 8.2 · accent 7.5 · ok 9.9 · warn 9.7
                      bad 8.0 · button label on accent 7.7
      on --c-surface  text 14.8 · muted 7.5 · accent 6.9 · ok 9.1 · warn 8.9
                      bad 7.3
