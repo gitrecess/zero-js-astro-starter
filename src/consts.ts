@@ -16,8 +16,25 @@ export const SITE_DESCRIPTION =
  * TODO: Canonical origin. Kept in sync with `site` in astro.config.mjs — the
  * config value drives the sitemap, this one drives canonical and og: URLs.
  * No trailing slash.
+ *
+ * Setting PUBLIC_SITE_URL in the build environment overrides both, so one branch
+ * can deploy to more than one origin — a preview deployment then emits its own
+ * canonical URLs instead of advertising the production ones. Leave it unset and
+ * the literal below is what ships; edit that and ignore the env var entirely.
+ *
+ * This read sees a local .env file. So does the one in astro.config.mjs, but
+ * only because that file calls process.loadEnvFile() explicitly — Astro
+ * evaluates its config before Vite loads .env, so without it the two would
+ * disagree rather than fail: canonical URLs on the new origin, sitemap and
+ * robots.txt on the old. Do not delete that call. Mode-specific files
+ * (.env.production, .env.local) are still read here and not there, so set
+ * deploy origins in the HOST's environment variables rather than in a file.
+ *
+ * Typed explicitly because import.meta.env is Record<string, any>: without the
+ * annotation SITE_URL silently becomes `any`, and this repo has no `astro check`
+ * to notice.
  */
-export const SITE_URL = 'https://example.com';
+export const SITE_URL: string = import.meta.env.PUBLIC_SITE_URL?.trim() || 'https://example.com';
 
 /** TODO: The `lang` attribute on <html>. Add a region if you want one, e.g. 'en-GB'. */
 export const SITE_LOCALE = 'en';
@@ -36,8 +53,18 @@ export const SITE_LOCALE = 'en';
  * seeing the noindex directive — which lets a URL stay indexed from inbound links
  * with no content. Letting crawlers in so they can read the noindex is what
  * actually keeps the site out of the index.
+ *
+ * PUBLIC_SITE_NOINDEX in the build environment overrides it, so a demo or
+ * marketing deployment of this same branch can be indexable while the default
+ * stays closed. Only the exact string `false` turns indexing on: env values are
+ * strings, `'false'` is truthy, and a boolean coercion here would make
+ * PUBLIC_SITE_NOINDEX=false do the opposite of what it says. Anything else —
+ * a typo, an empty value — leaves the site hidden, which is the safe direction.
+ *
+ * The `true` at the end of the line is still the committed default. Edit that.
  */
-export const SITE_NOINDEX = true;
+const noindexOverride = import.meta.env.PUBLIC_SITE_NOINDEX?.trim();
+export const SITE_NOINDEX = noindexOverride ? noindexOverride !== 'false' : true;
 
 /** TODO: Public contact address, shown in the footer and under the contact form. */
 export const CONTACT_EMAIL = 'you@example.com';

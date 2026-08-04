@@ -120,6 +120,10 @@ your site will post "Your Name".
 canonical tags, `og:` URLs and the contact form's redirect. They are the same
 origin held twice and must not drift.
 
+Editing both literals is the normal path and nothing else is required. If you
+later want one branch to deploy to several origins — a preview environment, a
+staging host — `PUBLIC_SITE_URL` overrides both at build time; see § [Deploy](#deploy).
+
 ## Where things live
 
 ```
@@ -192,6 +196,26 @@ Static output, no adapter, so any static host works. On **Cloudflare Pages**:
    - `PUBLIC_WEB3FORMS_KEY` — your Web3Forms access key.
    - `NODE_VERSION` — `22.17.1`.
 
+Two more are optional and exist so one branch can serve more than one origin.
+Both fall back to the committed values in `src/consts.ts`, so ignoring them
+entirely is a supported way to use this template:
+
+- `PUBLIC_SITE_URL` — overrides `site` and `SITE_URL` together, so canonical
+  tags, `og:` URLs, the sitemap and `robots.txt` all move as one. Setting it on
+  a **Preview** environment stops preview builds advertising the production
+  origin. Note Cloudflare gives each deployment its own
+  `<hash>.<project>.pages.dev` URL, so one value can only match the stable
+  branch-alias URL rather than every individual preview.
+- `PUBLIC_SITE_NOINDEX` — `false` makes the build indexable without editing
+  `src/consts.ts`. Only the exact string `false` does that; anything else leaves
+  the site hidden, so a typo fails in the safe direction.
+
+Prefer the **host's** environment variables over a local `.env` for these two.
+A plain `.env` does work — `astro.config.mjs` calls `process.loadEnvFile()` so
+that both reads see it, and a host variable still wins over the file — but
+mode-specific files (`.env.production`, `.env.local`) are read by `src/consts.ts`
+and not by `astro.config.mjs`, which would split the origin between the two.
+
 **`NODE_VERSION` is not optional.** Pages' default Node predates Astro 7's 22.12
 floor and the build fails without it. `.nvmrc` is committed as a second line of
 defence.
@@ -213,6 +237,10 @@ The site ships **hidden from search engines**. `SITE_NOINDEX` in `src/consts.ts`
 is `true`, which makes every page emit `noindex, nofollow` and stops `robots.txt`
 advertising the sitemap. Flip it to `false` when you are ready; that one change is
 enough, because `robots.txt` and the per-page meta tag both read from it.
+
+(`PUBLIC_SITE_NOINDEX=false` in the build environment does the same thing without
+an edit, which is how this repo's own demo is deployed. Editing the file is the
+simpler answer for a single site.)
 
 The subtlety worth understanding before you "improve" it: while hidden,
 `robots.txt` still **allows** crawling. Adding `Disallow: /` looks stricter but is
@@ -246,13 +274,22 @@ Things that look like omissions but are choices:
 - **Body copy capped at 66 characters.** Line length is the highest-leverage
   readability control on a text-heavy page.
 
-## The `demo` branch
+## How the live demo is built
 
-`main` is the template: placeholder copy, `example.com` as the origin, and
-`SITE_NOINDEX = true`. The `demo` branch exists only to deploy the public demo —
-its sole difference is the real origin and `SITE_NOINDEX = false`, because the
-demo is marketing and needs to be indexable. It is not drift, and you can delete
-it in your own copy.
+There is one branch. `main` is the template — placeholder copy, `example.com` as
+the origin, `SITE_NOINDEX = true` — and the [live demo](https://template.iamlukia.com)
+is that same branch built with `PUBLIC_SITE_URL` and `PUBLIC_SITE_NOINDEX` set,
+because the demo is marketing and needs a real origin and to be indexable.
+
+Nothing about that is specific to this repo, and it is the reason those two
+overrides exist at all: **one branch can deploy to more than one origin.** A
+preview or staging deployment sets `PUBLIC_SITE_URL` to its own hostname and gets
+correct canonical URLs, `og:` URLs and sitemap entries instead of advertising the
+production origin — which is what a preview deploy does by default, and it is a
+real SEO hazard rather than a cosmetic one.
+
+You do not have to use either variable. Leave both unset and the committed
+literals ship, which is the path § [Make it yours](#make-it-yours) describes.
 
 ## Licence
 
