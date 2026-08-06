@@ -55,38 +55,87 @@ import { SITE_TITLE, NAV_ITEMS } from '../consts';
      `scroll-padding-top` in global.css. The header wraps as the viewport
      narrows and its height steps at every wrap point, so how many heights it
      has is a property of your nav — not a fixed two. With the placeholder name
-     and the three labels this template ships it is two, measured:
+     and the three labels this template ships it is two, measured across 228
+     widths from 280px to 2560px:
 
-       ≤ 414px   102.6–103.4px   brand and nav on separate rows
-       ≥ 416px   65.5–71.4px     one row; the range is the fluid brand type,
+       ≤ 373px   102.6–103.0px   brand and nav on separate rows
+       ≥ 374px   65.3–71.4px     one row; the range is the fluid brand type,
                                  which stops growing at 1353px
 
      Each value below clears its case by at least 4.6px. Note the breakpoint is
-     27rem (432px), not the 416px where the header actually stops wrapping — it
-     is rounded UP from the measured transition, and up is the safe direction:
-     too high only leaves extra space above the heading you jumped to, too low
-     lets the header cover it outright.
+     23.5rem (376px), not the 374px where the header actually stops wrapping —
+     it is rounded UP from the measured transition, and up is the safe
+     direction: too high only leaves extra space above the heading you jumped
+     to, too low lets the header cover it outright. The cost is that 374–375px
+     takes the taller offset against the shorter header and over-clears by
+     ~43px, and 375px is a common phone width. Accepted: what a margin buys
+     against is sub-pixel disagreement at the boundary, and on the low side that
+     failure is the header covering the heading you jumped to.
 
-     TODO: re-measure after setting SITE_TITLE and NAV_ITEMS, and watch TWO
+     BOTH TRANSITIONS MOVED when the phone-width tightening at the bottom of
+     this file was added, and for these three labels no height did. The
+     single-row point came in from 415px to 374px and this breakpoint from 27rem
+     to 23.5rem, while both heights above stayed within 0.4px of what they were.
+
+     DO NOT READ THAT AS "TIGHTENING CANNOT MOVE A HEIGHT" — it can, and the
+     worked example below is where it does. Only the header's own `column-gap`
+     is height-neutral. `.header__list` is tightened with the `gap` SHORTHAND,
+     which sets `row-gap` too, 24→12px — so every state where the nav's own
+     list WRAPS gets 12px shorter per extra row. Measured on the worked example:
+     its two wrapped states came down 184.2→172.2px and 152.2→140.2px, exactly
+     12px each. The three labels shipped here never wrap THEIR OWN LIST anywhere
+     in 280–2560px — the header wraps, per the table above, but the list itself
+     stays on one line — so there is no such state to move. Yours may have one.
+
+     Editing that media query moves these transitions again — re-measure the
+     breakpoints AND the values, and re-measure a wrapped-list height if you
+     have one.
+
+     TODO: re-measure after setting SITE_TITLE and NAV_ITEMS, and watch THREE
      widths rather than one:
 
-       1. where the nav drops below the brand — raise the 27rem breakpoint above
-          it if it moved;
+       1. where the nav drops below the brand — raise the 23.5rem breakpoint
+          above it if it moved;
        2. where the nav's OWN list wraps onto a second line. That is a third,
           taller state and two values cannot express it. The bare `:root` rule
           below is the tallest case: raise it to clear the wrapped-list height,
-          then add a `min-width` query between it and the 27rem one for the
-          middle case, mirroring how the two below already step down.
+          then add a `min-width` query between it and the 23.5rem one for the
+          middle case, mirroring how the two below already step down;
+       3. how far up the phone-width block at the bottom of this file needs to
+          reach. Its 25.875rem cap is a measurement of THIS nav too: a wrap
+          point above 414px is one the tightening cannot move, however much it
+          may still help at narrower widths. Raise the cap past your own wrap
+          point.
 
      Checking only (1) is the trap, and it is not hypothetical. Swapping in a
      longer name and a fourth label — "Alexandra Montgomery", with Work ·
-     Services · About · Contact — moves the single-row point from 416px out to
-     600px, makes the nav's own list wrap below 322px, and below 286px wraps the
-     wordmark too, for a fourth state at 184.2px. Left at the values below, that
-     nav puts the header over the heading at 105 of 168 widths sampled between
-     280px and 2560px: by ~28px through the whole 432–598px band, by 44px where
-     the list wraps, and by 76px where the wordmark wraps as well. Four states,
-     from a change to two constants in consts.ts.
+     Services · About · Contact — takes the single-row point from the 374px
+     above out to 599px, makes the nav's own list wrap at 285px (140.2px tall)
+     and the wordmark wrap as well at 284px (172.2px). Left at the values below,
+     that nav puts the header over the heading at 113 of 228 widths sampled
+     between 280px and 2560px: by 27–29px through the whole 376–598px band, by
+     32px where the list wraps and by 64px where the wordmark wraps too. Four
+     states, from a change to two constants in consts.ts.
+
+     599px is where that nav goes one row BOTH with the tightening and without
+     it, and that is (3) stated as a measurement. Its single-row transition sits
+     above the 25.875rem cap, so nothing at the bottom of this file, AS CAPPED,
+     can move it. That is (3)'s instruction to raise the cap, not an argument
+     against it. Read it narrowly the other way too: the block still applies to
+     that nav BELOW the cap and does real work there — see the trade below — but
+     the one width it most needs fixed is the one a capped tightening cannot
+     reach.
+
+     THE TIGHTENING WAS NOT A NET GAIN FOR THAT NAV, AND THE HONEST FORM OF THAT
+     IS A TRADE RATHER THAN A VERDICT. Measured both ways over the same 228
+     widths: 93 failing before, 113 after. It FIXED 36 widths — 286–321px, where
+     the shorter INTER-ITEM gap (the column half of that same shorthand, not the
+     row half above) is enough to keep the list on one line; below 286px it
+     wraps anyway — and cut the worst over-clear from 76.2px to 64.2px. It BROKE
+     56 (376–431px), because the breakpoint above came down with the transition
+     it was measured against. A shorter nav gains 38px of viewport on a phone.
+     All of it is measurements of the three labels shipped here, and none of it
+     survives you editing consts.ts.
 
      A single clamp() cannot express any of this: the height steps down at each
      wrap point and clamp() is monotonic. */
@@ -94,7 +143,7 @@ import { SITE_TITLE, NAV_ITEMS } from '../consts';
     --header-offset: 6.75rem;
   }
 
-  @media (min-width: 27rem) {
+  @media (min-width: 23.5rem) {
     :root {
       --header-offset: 4.75rem;
     }
@@ -173,5 +222,58 @@ import { SITE_TITLE, NAV_ITEMS } from '../consts';
 
   .header__link:hover {
     color: var(--c-text);
+  }
+
+  /* Phone widths only: buy back enough inline space that the brand and the nav
+     share one row instead of the nav dropping beneath it. Two levers, both of
+     them whitespace — the header's own column gap (24→8px) and the list's
+     inter-item gap (24→12px). With the placeholder name and these three labels
+     that moves the single-row point from 415px to 374px, so a 375px or 390px
+     phone gets a 65px sticky header instead of a 103px one. Measured, not
+     estimated: at 390px the brand is 129px and the list 213px, which with the
+     24px gap needs 366px against the 342px a 390px viewport leaves inside
+     `.wrap` — 24px short, and the two gaps return 40px.
+
+     A THIRD LEVER EXISTS AND IS DELIBERATELY NOT TAKEN. `.header__link` sets no
+     `font-size`, so every label inherits body's --step-0 (~16.1px at 390px)
+     where --step--1 would be ~13.4px — about 17% of every label's width sitting
+     untried. Adding `font-size: var(--step--1)` to the block below takes the
+     single-row point to 348px, measured, which is what 360px-class Androids
+     need. It is left out because it is the one lever that costs something when
+     it is NOT needed: the two gaps are harmless on a nav that already fits,
+     while a type size shrinks labels this template cannot see, for an adopter
+     who may have two short ones and no wrapping to fix. If yours still wraps at
+     a width you care about, that declaration is the next thing to add — and
+     then re-measure the block above, because it moves both transitions.
+
+     Capped at 25.875rem (414px) because at 415px the untightened header is
+     already one row and has nothing to fix; tightening desktop nav spacing
+     would be a cost bought for nothing. The cap sits just below that measured
+     transition, so no band is left both untightened and wrapping.
+
+     These are measurements, not universal figures — re-measure after setting
+     SITE_TITLE and NAV_ITEMS. Method, which needs no tooling beyond a browser:
+     build, serve `dist/`, and from a page on that same origin load `/index.html`
+     into an `<iframe>` you resize across 280–2560px, setting the frame
+     document's `documentElement.style.overflow = 'hidden'` so its own scrollbar
+     does not steal layout width. At each width record `.header`'s height and
+     the resolved `scroll-padding-top` on `<html>`, and assert the second is
+     never less than the first.
+
+     ONE INSTRUMENT NEEDS CARE. Test brand-and-nav-on-one-row by whether their
+     vertical ranges OVERLAP, not by counting distinct `top` values:
+     `.header__inner` is `align-items: center`, so two children of different
+     heights sharing a row have different tops, and a distinct-tops count reads
+     "wrapped" at every width including 2560px. That is a check that cannot
+     fail. Counting distinct tops among `.header__list li` is fine and is how
+     you find the nav's own wrap — those are siblings of equal height. */
+  @media (max-width: 25.875rem) {
+    .header__inner {
+      column-gap: var(--space-2xs);
+    }
+
+    .header__list {
+      gap: var(--space-xs);
+    }
   }
 </style>

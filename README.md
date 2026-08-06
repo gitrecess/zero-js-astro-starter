@@ -99,14 +99,18 @@ If your name is much longer than the placeholder, or you add a nav item, check
 the sticky header before you ship. It wraps as the viewport narrows and its
 height steps at every wrap point; in-page anchors are offset against that by
 `--header-offset` in `src/components/Nav.astro`. Narrow your browser and watch
-**two** widths, not one: where the nav drops below the brand, and where the nav's
-own list wraps onto a second line. The three labels shipped here only ever do the
-first, which is why two values are enough for them — a longer wordmark or a
-fourth label can add the second, and that is a third height needing a third value
-and another media query. Too low a breakpoint is the harmful direction, because
-the header then covers the heading you jumped to. The comment on that rule has
-the measurements and the method, and it is marked `TODO:` so the placeholder
-sweep finds it.
+**three** widths, not one: where the nav drops below the brand, where the nav's
+own list wraps onto a second line, and how far up the phone-width tightening at
+the bottom of that file needs to reach. The three labels shipped here only ever
+do the first, which is why two values are enough for them — a longer wordmark or
+a fourth label can add the second, and that is a third height needing a third
+value and another media query. The third width is the one with no height of its
+own: that tightening is capped just below the width where *these* labels stop
+wrapping, so a wrap point above the cap is one it cannot move — however much it
+may still help you at narrower widths. Too low a breakpoint is the harmful
+direction, because the header then covers the heading you jumped to. The
+comment on that rule has the measurements and the method, and it is marked
+`TODO:` so the placeholder sweep finds it.
 
 **2. The mark.** The nav brand derives its letter from `SITE_TITLE`, so it follows
 your name automatically. The favicon set in `public/` is static and does not —
