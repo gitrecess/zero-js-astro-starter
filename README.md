@@ -215,10 +215,15 @@ entirely is a supported way to use this template:
   the site hidden, so a typo fails in the safe direction.
 
 Prefer the **host's** environment variables over a local `.env` for these two.
-A plain `.env` does work — `astro.config.mjs` calls `process.loadEnvFile()` so
-that both reads see it, and a host variable still wins over the file — but
-mode-specific files (`.env.production`, `.env.local`) are read by `src/consts.ts`
-and not by `astro.config.mjs`, which would split the origin between the two.
+A plain `.env` does work — `astro.config.mjs` loads it explicitly so that both
+reads see it, and a host variable still wins over the file.
+
+**A mode-specific file does not, and the build now stops rather than letting it
+through.** `.env.production`, `.env.local` and `.env.production.local` are read
+by `src/consts.ts` and not by `astro.config.mjs`, so `PUBLIC_SITE_URL` in one of
+them used to move your canonical URLs and `robots.txt` while leaving the sitemap
+on the old origin — at exit 0, with nothing to see. Putting it in one of those
+files is now an error naming the file and the fix. Use `.env`, or your host.
 
 **`NODE_VERSION` is not optional.** Pages' default Node predates Astro 7's 22.12
 floor and the build fails without it. `.nvmrc` is committed as a second line of
