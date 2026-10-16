@@ -21,7 +21,8 @@
 # user-supplied HTML.
 #
 # No site origin appears below, deliberately — 'self' covers it. That is what
-# lets this file be identical on main and on the demo branch.
+# lets this file work unchanged on whatever host and domain you deploy to,
+# preview deployments included.
 #
 # HSTS carries no includeSubDomains: on a subdomain deploy it would bind sibling
 # subdomains you may not control or serve over HTTPS. Add it once you know it is
