@@ -159,6 +159,34 @@ body {
   font-size: var(--step-0);
   line-height: var(--leading-normal);
   -webkit-font-smoothing: antialiased;
+  isolation: isolate;
+}
+
+/* The ground fills the whole window, with no band across the bottom or the
+   middle (PORTFOLIO-SITES-FILL-THE-VIEWPORT-1).
+
+   Brave draws a raster tile that holds nothing but the ground colour as a flat
+   compositor fill, outside the colour-profile transform, while a tile holding
+   any content is rastered and colour-managed. On a page shorter than the
+   window the empty tiles read a level or two off the rest: a band, starting on
+   a tile boundary rather than where the content ends. This fixed backdrop is
+   one solid layer over the whole viewport, so every tile reads alike.
+
+   `isolation: isolate` on body is half of the fix. It keeps the backdrop above
+   body's own background; without it the band survives wherever body paints
+   its own box (measured on readlater, 2026-10-17). `min-height` and a
+   background on `html` do nothing, measured in circle-connect's base.css.
+
+   Proven only by a capture from a real Brave window on a retina display,
+   decoded against a control: headless engines do not reproduce it. Residual:
+   an element that paints the ground itself, such as the sticky header, reads
+   a level or two off the backdrop. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--c-bg);
 }
 
 img,
