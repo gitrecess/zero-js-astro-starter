@@ -24,11 +24,21 @@ export const SITE_DESCRIPTION =
  *
  * This read sees a local .env file. So does the one in astro.config.mjs, but
  * only because that file calls process.loadEnvFile() explicitly — Astro
- * evaluates its config before Vite loads .env, so without it the two would
- * disagree rather than fail: canonical URLs on the new origin, sitemap and
- * robots.txt on the old. Do not delete that call. Mode-specific files
- * (.env.production, .env.local) are still read here and not there, so set
- * deploy origins in the HOST's environment variables rather than in a file.
+ * evaluates its config before Vite loads .env, so without it the two disagree
+ * rather than fail. Do not delete that call.
+ *
+ * The direction of that disagreement is the opposite of the obvious guess, and
+ * it was measured rather than reasoned. `site` in astro.config.mjs drives ONLY
+ * the sitemap XML; robots.txt is a generated route importing SITE_URL from this
+ * file, so it follows canonical. Disable the call and everything moves to the
+ * new origin except the sitemap's own <loc> entries — leaving robots.txt
+ * advertising a sitemap whose contents are cross-origin, which is rejected.
+ * astro.config.mjs has the measured table.
+ *
+ * Mode-specific files (.env.production, .env.local) are still read here and not
+ * there. astro.config.mjs FAILS THE BUILD when one of them sets
+ * PUBLIC_SITE_URL, rather than leaving that as advice — set deploy origins in
+ * your host's environment variables rather than in a file.
  *
  * Typed explicitly because import.meta.env is Record<string, any>: without the
  * annotation SITE_URL silently becomes `any`, and this repo has no `astro check`
