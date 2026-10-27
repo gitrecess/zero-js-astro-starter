@@ -28,7 +28,31 @@ import { SITE_TITLE, SITE_URL, CONTACT_SUBJECT } from '../consts';
  */
 const accessKey = import.meta.env.PUBLIC_WEB3FORMS_KEY?.trim();
 const redirectUrl = new URL('/thanks', SITE_URL).href;
+
+/*
+ * The redirect above is built from SITE_URL, and SITE_URL falls back to the
+ * placeholder https://example.com. A key alone used to arm the form, so a site
+ * deployed with the key set and the origin left alone sent every visitor to
+ * example.com/thanks after a successful send, where `form-action` in
+ * public/_headers then blocked the redirect: the visitor saw a browser error
+ * for a message that had in fact arrived. So the placeholder origin disarms the
+ * form exactly as a missing key does, and the notice says which one is missing.
+ */
+const placeholderOrigin = new URL(SITE_URL).origin === 'https://example.com';
+const armed = Boolean(accessKey) && !placeholderOrigin;
 ---
+
+{
+  accessKey && placeholderOrigin && (
+    <p class="notice">
+      <strong>Form not wired up yet.</strong> The key is set, but the site's
+      origin is still the placeholder <code>https://example.com</code>, so a sent
+      message would redirect your visitor there. Set <code>PUBLIC_SITE_URL</code>{' '}
+      in your host's environment variables, or <code>SITE_URL</code> in{' '}
+      <code>src/consts.ts</code>, then rebuild.
+    </p>
+  )
+}
 
 {
   !accessKey && (
@@ -107,15 +131,21 @@ const redirectUrl = new URL('/thanks', SITE_URL).href;
        the Web3Forms dashboard under the form's settings. -->
 
   <!--
-    Disabled while the key is missing, and the notice above is the other half of
-    it: without this the form still POSTs, Web3Forms rejects a keyless
-    submission, and the visitor's message is gone. A disabled button on its own
-    would be mute — the notice is what says why, so keep the two together.
+    Disabled while the key or the origin is missing, and the notices above are
+    the other half of it: without this a keyless form still POSTs, Web3Forms
+    rejects the submission, and the visitor's message is gone. A disabled
+    button on its own would be mute — the notice is what says why, so keep the
+    two together.
+
+    This covers a key that is MISSING, and nothing more. A key that is wrong,
+    revoked or out of quota still arms the form, and what Web3Forms does with
+    the message then is not something this page can see — so send yourself one
+    test message after every deploy that changes the key (the README says so).
 
     `.form button[disabled]` in global.css already styles this state; nothing
     new is needed there.
   -->
-  <button class="button" type="submit" disabled={!accessKey}>Send message</button>
+  <button class="button" type="submit" disabled={!armed}>Send message</button>
 </form>
 
 <style>

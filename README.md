@@ -152,8 +152,18 @@ Set `PUBLIC_WEB3FORMS_KEY`:
 - in production — your host's environment variables
 
 Until it is set, the form renders a visible "not wired up" notice and its Send
-button stays disabled, rather than failing silently — so a form that is not
-wired up cannot swallow a visitor's message.
+button stays disabled, rather than failing silently. **The same happens while
+the site's origin is still the placeholder `https://example.com`**: after a send,
+Web3Forms redirects the visitor to `/thanks` on your origin, and with the
+placeholder that would be `example.com/thanks`, which the CSP's `form-action`
+then blocks. So set your origin — `SITE_URL` in `src/consts.ts`, or
+`PUBLIC_SITE_URL` on your host — along with the key.
+
+**That guard covers a missing key, not a broken one.** A key that is wrong,
+revoked or out of this month's quota still arms the form, and nothing on the page
+can see what Web3Forms does with the message after that. So after every deploy
+that sets or changes the key, **send yourself one test message from the live
+site** and check that it arrives.
 
 The key is public by design; it appears in the page source of every Web3Forms
 site. The env var gives it one home, not secrecy — don't put anything genuinely
@@ -190,19 +200,57 @@ it stops the form working locally, and it can only check `Origin`/`Referer` —
 headers a scripted client sets to whatever it likes. Web3Forms' own wording is
 that it "will *potentially* reduce spam attacks".
 
+**Either upgrade also needs a change to `public/_headers`, and neither change is
+the obvious one.** Measured in headless Chromium against this template's own
+headers:
+
+- **hCaptcha needs four origins, not one.** `script-src 'none'` becomes
+  `script-src https://web3forms.com https://js.hcaptcha.com`, because the
+  client script loads hCaptcha's API from the second. Add
+  `frame-src https://*.hcaptcha.com`, since `default-src 'self'` blocks
+  the widget otherwise. The frames measured came from `newassets.hcaptcha.com`;
+  one run cannot show that host is stable, so take the wildcard. And `connect-src 'none'` becomes
+  `connect-src https://*.hcaptcha.com`: the widget fetches from a random
+  `<hex>.w.hcaptcha.com` subdomain on every load, so no fixed host will do. With
+  only the script origin, the widget never renders and no token is produced.
+  Once hCaptcha is on in the dashboard, that means **every** message is
+  rejected. In that measurement — the widget rendering and its challenge
+  loading, with no challenge solved — `img-src` and `style-src` needed nothing.
+  hCaptcha's own CSP guide allows `https://hcaptcha.com https://*.hcaptcha.com`
+  more broadly; these four are the measured minimum, not the vendor's list.
+- **Domain restriction needs `Referrer-Policy: strict-origin-when-cross-origin`**
+  in place of the shipped `no-referrer`. Under `no-referrer`, a cross-origin form
+  POST sends `Origin: null` and no `Referer`, so the check has nothing to read.
+  Under `strict-origin-when-cross-origin`, both headers carry your origin and no
+  path.
+
+Only the browser side of either change was measured, so send one real message
+after making it.
+
 ## Deploy
 
-Static output, no adapter, so any static host works. On **Cloudflare Pages**:
+Static output, no adapter, so the site builds for any static host. **The
+security headers do not travel with it.** Everything in `public/_headers` —
+the CSP and its `script-src 'none'`, HSTS, `Referrer-Policy`,
+`Permissions-Policy` — is read by **Cloudflare (Pages, and Workers static
+assets) and Netlify**, and by no host that lacks a `_headers` convention. On S3, nginx or anything else the same build ships with none of
+them, and nothing tells you: set the same headers the host's own way (an nginx
+`add_header`, a CloudFront response-headers policy). GitHub Pages cannot set
+response headers at all, so there the only answer is a different host.
+
+On **Cloudflare Pages**:
 
 1. Workers & Pages → Create → Pages → Connect to Git, and pick your repo.
 2. Build command `npm run build`, output directory `dist`.
 3. Environment variables, set for **both Production and Preview**:
    - `PUBLIC_WEB3FORMS_KEY` — your Web3Forms access key.
-   - `NODE_VERSION` — `22.17.1`.
+   - `NODE_VERSION` — `22.23.4`.
 
 Two more are optional and exist so one branch can serve more than one origin.
 Both fall back to the committed values in `src/consts.ts`, so ignoring them
-entirely is a supported way to use this template:
+entirely is a supported way to use this template — **once `SITE_URL` there is
+your own origin**, since the contact form stays disabled while it is the
+placeholder:
 
 - `PUBLIC_SITE_URL` — overrides `site` and `SITE_URL` together, so canonical
   tags, `og:` URLs, the sitemap and `robots.txt` all move as one. Setting it on
@@ -236,8 +284,8 @@ do, make the apex canonical so it matches `site` in `astro.config.mjs`, and send
 `src/pages/404.astro` builds to `dist/404.html`, which Pages serves automatically
 for unmatched paths on a static project — no `_routes.json` needed.
 
-`public/_headers` ships a CSP and the usual hardening headers, read by Pages and
-by Netlify. Its `script-src 'none'` is the zero-JS budget enforced rather than
+`public/_headers` ships a CSP and the usual hardening headers, read by Cloudflare and
+Netlify (see the top of this section for every other host). Its `script-src 'none'` is the zero-JS budget enforced rather than
 asserted, so adding a script means widening it — the comments in the file say how.
 
 ## Going live
